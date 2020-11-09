@@ -50,7 +50,7 @@ Dc=100; %length (in # bins) of the segments in which the spike train is divided 
 start_t = nanmin(spM(:));
 end_t = nanmax(spM(:));
 
-for gg=1:length(BinSizes) % Cowen: parfor does not really save much time.
+parfor gg=1:length(BinSizes) % Cowen: parfor does not really save much time - well - guess that depends on the number of binsizes explored..
     int=BinSizes(gg);
     maxlag=MaxLags(gg);
     fprintf('%d - testing: bin size=%f sec; max tested lag=%d \n', gg, int, maxlag);
