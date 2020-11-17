@@ -37,30 +37,42 @@ function [assembly]=Main_assemblies_detection(spM,MaxLags,BinSizes,ref_lag,alph,
 %
 %  last update 11/01/2016
 %  last update 13/02/2016 TestPair.m update
+% 
+% Cowen 2020: Added the option of passing in a cell array of pre-binned data
+% instead of the spM which is binned in this function. This allows different binning approaches to be used
+% (e.g., by phase or variable bin sizes - that you can't do with
+% histcounts).
 
 if nargin<4 || isempty(ref_lag), ref_lag=2; end
 if nargin<5 || isempty(alph), alph=0.05; end
 if nargin<6 || isempty(No_th), No_th=0; end      % no limitation on the number of assembly occurrences
 if nargin<7 || isempty(O_th), O_th=Inf; end     % no limitation on the assembly order (=number of elements in the assembly)
 if nargin<8 || isempty(bytelimit), bytelimit=Inf; end     % no limitation on assembly dimension
-
-nneu=size(spM,1); % number of units
+if ~iscell(spM)
+    nneu=size(spM,1); % number of units
+    start_t = nanmin(spM(:));
+    end_t = nanmax(spM(:));
+else
+    nneu=size(spM{1},1); % number of units
+end
 assemblybin=cell(1,length(BinSizes));
 Dc=100; %length (in # bins) of the segments in which the spike train is divided to compute #abba variance (parameter k).
-start_t = nanmin(spM(:));
-end_t = nanmax(spM(:));
 
-parfor gg=1:length(BinSizes) % Cowen: parfor does not really save much time - well - guess that depends on the number of binsizes explored..
+for gg=1:length(BinSizes) % Cowen: parfor does not really save much time - well - guess that depends on the number of binsizes explored..
     int=BinSizes(gg);
     maxlag=MaxLags(gg);
     fprintf('%d - testing: bin size=%f sec; max tested lag=%d \n', gg, int, maxlag);
     %%%%%%%%%%%%%%%%%%%%% Binning  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % the spike train is binned with temporal resolution 'int'
-    tb=start_t:int:end_t;
-    binM=zeros(nneu,length(tb)-1,'uint8');
-    
-    for n=1:nneu
-        binM(n,:) = histcounts(spM(n,:),tb);
+    if ~iscell(spM)
+        tb=start_t:int:end_t;
+        binM=zeros(nneu,length(tb)-1,'uint8');
+        for n=1:nneu
+            binM(n,:) = histcounts(spM(n,:),tb);
+        end
+    else
+        tb=0:size(spM{gg},2);
+        binM = spM{gg};
     end
     
     if size(binM,2)-MaxLags(gg)<100

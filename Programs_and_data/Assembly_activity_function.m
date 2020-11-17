@@ -35,6 +35,8 @@ function [assembly_activity]=Assembly_activity_function(As_across_bins, assembly
 %
 %  last update 11/01/2016
 %
+% Cowen: more work to do here to get this to work with custion binnned
+% spike time matrices.
 
 
 if nargin<5 || isempty(lagChoice), lagChoice='duration'; end;  
@@ -45,8 +47,8 @@ as=As_across_bins;
 assembly_activity=cell(length(as),1);
  
 for n=1:length(as)
-   
-   tb=assembly.bin{find(BinSizes==as{n}.bin)}.bin_edges; 
+   ix = find(BinSizes==as{n}.bin);
+   tb=assembly.bin{ix}.bin_edges; 
   
    switch act_count
        case 'full'
