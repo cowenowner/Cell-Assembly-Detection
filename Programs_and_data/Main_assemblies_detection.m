@@ -83,9 +83,9 @@ for gg=1:length(BinSizes) % Cowen: parfor does not really save much time - well 
         if ~isempty(assemblybin{gg})
             assemblybin{gg}.bin_edges=tb;
         end
-        fprintf('%d - testing done\n',gg);
-        fname = sprintf('assembly%d.mat', gg);
-        parsave(fname,assemblybin{gg})
+        %         fprintf('%d - testing done\n',gg);
+        %         fname = sprintf('assembly%d.mat', gg);
+        %         parsave(fname,assemblybin{gg})
     end
 end
 assembly.bin=assemblybin;
